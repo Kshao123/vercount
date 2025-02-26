@@ -1,0 +1,41 @@
+name: Handle Cdn Cache
+
+on:
+  push:
+    branches:
+      - main
+  deployment_status:
+    states: [success]
+
+jobs:
+  run:
+    if: github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success'
+    runs-on: ubuntu-latest
+    env:
+      DOMAIN: 'https://busuanzi.ksh7.com'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Tencent Cloud CDN Purge Paths Cache
+        uses: tardis-ksh/Tencent-Cloud-CDN-Purge-Paths-Cache@v1
+        with:
+          paths: |
+            ${{env.DOMAIN}}
+          secret_id: ${{secrets.TENCENT_CDN_CACHE_SECRET_ID}}
+          secret_key: ${{secrets.TENCENT_CDN_CACHE_SECRET_KEY}}
+          flush_type: delete
+
+      - name: Wait for 30 seconds
+        run: sleep 30
+
+      - name: Tencent Cloud CDN Push Paths Cache
+        uses: tardis-ksh/Tencent-Cloud-CDN-Push-Paths-Cache@v1
+        with:
+          secret_id: ${{secrets.TENCENT_CDN_CACHE_SECRET_ID}}
+          secret_key: ${{secrets.TENCENT_CDN_CACHE_SECRET_KEY}}
+          Urls: |
+            ${{env.DOMAIN}}/js
