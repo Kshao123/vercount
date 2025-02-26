@@ -10,6 +10,11 @@ const ratelimit = new Ratelimit({
 
 // Precompile the User-Agent regex
 const uaRegex = /mozilla\/|chrome\/|safari\//;
+const allowedOrigins = [
+  "https://ksh7.com",
+  "https://www.ksh7.com",
+  "http://local.ksh7.com:4000"
+];
 
 export const config = {
   matcher: "/log",
@@ -18,6 +23,11 @@ export const config = {
 export default async function middleware(request: NextRequest) {
   const ip = request.ip ?? "127.0.0.1";
   const ua = request.headers.get("user-agent")?.toLowerCase() || "unknown";
+  const origin = request.headers.get("origin");
+
+  if (!allowedOrigins.includes(origin!)) {
+    return new NextResponse(null, { status: 403 });
+  }
 
   // Perform rate limiting first
   const { success, limit, reset, remaining } = await ratelimit.limit(ip);
@@ -62,5 +72,7 @@ export default async function middleware(request: NextRequest) {
     });
   }
 
-  return NextResponse.next();
+  const response = NextResponse.next();
+  response.headers.set("Access-Control-Allow-Origin", origin!);
+  return response;
 }
