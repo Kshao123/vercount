@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
     header.get("X-Real-IP");
 
   // Use structured logging where possible for easier parsing
-  logger.debug("Request details", {
+  logger.info("Request details", {
     clientHost,
     realIp: header.get("X-Real-IP"),
     xForwardedFor: header.get("X-Forwarded-For"),

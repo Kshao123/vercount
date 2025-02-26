@@ -35,7 +35,7 @@ var visitorCounterCaller, visitorCounterDisplay;
       try {
         visitorCounterDisplay.hideAll();
         
-        const response = await fetch(`${apiUrl}?url=${window.location.href}`, {
+        const response = await fetch(`${apiUrl}?url=${encodeURIComponent(window.location.href)}`, {
           // method: "POST",
           headers: {
             "Content-Type": "application/json",
