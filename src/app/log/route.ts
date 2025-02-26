@@ -10,11 +10,11 @@ import syncBusuanziData from "@/lib/sync-busuanzi-data";
 import logger from "@/lib/logger"; // Ensure this logger is configured for env-based logging
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req: Request) {
-  return redirect("/");
-}
+// export async function GET(req: Request) {
+//   return redirect("/");
+// }
 
-export async function POST(req: NextRequest) {
+export async function GET(req: NextRequest) {
   const header = headers();
   const data = await req.json();
 
@@ -24,9 +24,9 @@ export async function POST(req: NextRequest) {
   }
 
   const clientHost =
+    header.get("X-Forwarded-For")?.split(",")[0] ||
     req.ip ||
-    header.get("X-Real-IP") ||
-    header.get("X-Forwarded-For")?.split(",")[0];
+    header.get("X-Real-IP");
 
   // Use structured logging where possible for easier parsing
   logger.debug("Request details", {

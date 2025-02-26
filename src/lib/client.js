@@ -25,22 +25,22 @@ var visitorCounterCaller, visitorCounterDisplay;
   }
 
   const getBaseUrl = () => {
-    return "https://events.vercount.one";
+    return "https://busuanzi.ksh7.com";
   };
 
   visitorCounterCaller = {
     fetch: async function (callback) {
       const baseUrl = getBaseUrl();
-      const apiUrl = `${baseUrl}/log?jsonpCallback=VisitorCountCallback`;
+      const apiUrl = `${baseUrl}/log`;
       try {
         visitorCounterDisplay.hideAll();
         
-        const response = await fetch(apiUrl, {
-          method: "POST",
+        const response = await fetch(`${apiUrl}?origin=${window.location.href}`, {
+          // method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ url: window.location.href }),
+          // body: JSON.stringify({ url: window.location.href }),
         });
         const data = await response.json();
         documentReady(() => {
