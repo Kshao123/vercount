@@ -16,7 +16,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   const header = headers();
-  const data = await req.json();
+  const data = req;
+  // const data = await req.json();
 
   if (!data.url) {
     logger.warn(`POST request with missing URL`, { status: 400 });
@@ -41,7 +42,9 @@ export async function GET(req: NextRequest) {
     return Response.json({ error: "Missing host" }, { status: 400 });
   }
 
-  const parsedUrl = new URL(data.url);
+  const hosts = new URL(data.url);
+  const parsedUrl = new URL(hosts.searchParams.get("url")!);
+
   const [host, path] = [
     parsedUrl.host,
     parsedUrl.pathname.replace(/\/index$/, ""),
