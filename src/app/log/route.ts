@@ -25,12 +25,14 @@ export async function GET(req: NextRequest) {
   }
 
   const clientHost =
+    // 需自行在 Tencent Cdn 中增加回源头部 => $client_ip
+    header.get("X-Custom-IP") ||
     header.get("X-Forwarded-For")?.split(",")[0] ||
     req.ip ||
     header.get("X-Real-IP");
 
   // Use structured logging where possible for easier parsing
-  logger.info("Request details", {
+  logger.debug("Request details", {
     clientHost,
     realIp: header.get("X-Real-IP"),
     customIp: header.get("X-Custom-IP"),
