@@ -47,7 +47,12 @@ export async function GET(req: NextRequest) {
   }
 
   const hosts = new URL(data.url);
-  const parsedUrl = new URL(hosts.searchParams.get("url")!);
+  const url = hosts.searchParams.get("url");
+  if (!url) {
+    return Response.json({ error: "Missing params url" }, { status: 400 });
+  }
+
+  const parsedUrl = new URL(url);
 
   const [host, path] = [
     parsedUrl.host,
