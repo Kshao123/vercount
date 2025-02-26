@@ -12,7 +12,7 @@ const nextConfig = {
       source: "/log",
       headers: [
         { key: "Access-Control-Allow-Credentials", value: "true" },
-        { key: "Access-Control-Allow-Origin", value: "https://ksh7.com,https://www.ksh7.com,http://local.ksh7.com" },
+        { key: "Access-Control-Allow-Origin", value: "https://ksh7.com,https://www.ksh7.com,http://local.ksh7.com:4000" },
         {
           key: "Access-Control-Allow-Methods",
           value: "GET,DELETE,PATCH,POST,PUT,OPTIONS",
