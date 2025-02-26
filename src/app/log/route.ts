@@ -33,6 +33,8 @@ export async function GET(req: NextRequest) {
   logger.info("Request details", {
     clientHost,
     realIp: header.get("X-Real-IP"),
+    customIp: header.get("X-Custom-IP"),
+    xForwardedHost: header.get("X-Forwarded-Host"),
     xForwardedFor: header.get("X-Forwarded-For"),
     reqIp: req.ip,
   });
