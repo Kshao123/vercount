@@ -54,17 +54,18 @@ export async function GET(req: NextRequest) {
 
   const parsedUrl = new URL(url);
 
-  const [host, path] = [
+  const [host, path, protocol] = [
     parsedUrl.host,
-    parsedUrl.pathname.replace(/\/index$/, ""),
+    parsedUrl.pathname.replace(/\/index(\.html?\/?)$/i, ""),
+    parsedUrl.protocol,
   ];
 
   // logger.info(`Processing request`, { host, path, clientHost });
 
   const [siteUVBefore, sitePVBefore, pagePVBefore] = await Promise.all([
-    getSiteUVBeforeData(host, path),
-    getSitePVBeforeData(host, path),
-    getPagePVBeforeData(host, path),
+    getSiteUVBeforeData(host, path, protocol),
+    getSitePVBeforeData(host, path, protocol),
+    getPagePVBeforeData(host, path, protocol),
   ]);
 
   // logger.info(`Initial data`, {
@@ -74,9 +75,9 @@ export async function GET(req: NextRequest) {
   // });
 
   let [siteUVAfter, sitePVAfter, pagePVAfter] = await Promise.all([
-    updateSiteUV(host, clientHost),
-    updateSitePV(host),
-    updatePagePV(host, path),
+    updateSiteUV(host, clientHost, protocol),
+    updateSitePV(host, protocol),
+    updatePagePV(host, path, protocol),
   ]);
 
   siteUVAfter += siteUVBefore;
@@ -91,7 +92,7 @@ export async function GET(req: NextRequest) {
     pagePVAfter,
   });
 
-  syncBusuanziData(host, path);
+  syncBusuanziData(host, path, protocol);
 
   const dataDict = {
     site_uv: siteUVAfter,

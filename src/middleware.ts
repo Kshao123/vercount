@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Ratelimit } from "@upstash/ratelimit";
-import { kv } from "@vercel/kv";
+// import { Ratelimit } from "@upstash/ratelimit";
+// import { kv } from "@vercel/kv";
 import logger from "@/lib/logger";
 
-const ratelimit = new Ratelimit({
-  redis: kv,
-  limiter: Ratelimit.slidingWindow(100, "1 m"),
-});
+// const ratelimit = new Ratelimit({
+//   redis: kv,
+//   limiter: Ratelimit.slidingWindow(100, "1 m"),
+// });
 
 // Precompile the User-Agent regex
 const uaRegex = /mozilla\/|chrome\/|safari\//;
@@ -30,19 +30,19 @@ export default async function middleware(request: NextRequest) {
   }
 
   // Perform rate limiting first
-  const { success, limit, reset, remaining } = await ratelimit.limit(ip);
-
-  if (!success) {
-    logger.warn({
-      message: "Rate limit exceeded",
-      ip,
-      limit,
-      reset,
-      remaining,
-      ua,
-    });
-    return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 });
-  }
+  // const { success, limit, reset, remaining } = await ratelimit.limit(ip);
+  //
+  // if (!success) {
+  //   logger.warn({
+  //     message: "Rate limit exceeded",
+  //     ip,
+  //     limit,
+  //     reset,
+  //     remaining,
+  //     ua,
+  //   });
+  //   return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 });
+  // }
 
   // Log only if rate limit check passes
   logger.info({
@@ -63,14 +63,14 @@ export default async function middleware(request: NextRequest) {
   // }
 
   // Log warning if approaching rate limit
-  if (remaining < 20) {
-    logger.warn({
-      message: "Approaching rate limit",
-      ip,
-      remaining,
-      ua,
-    });
-  }
+  // if (remaining < 20) {
+  //   logger.warn({
+  //     message: "Approaching rate limit",
+  //     ip,
+  //     remaining,
+  //     ua,
+  //   });
+  // }
 
   const response = NextResponse.next();
   response.headers.set("Access-Control-Allow-Origin", origin!);
