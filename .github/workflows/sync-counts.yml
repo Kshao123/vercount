@@ -1,0 +1,48 @@
+name: Sync Repository Counts
+
+on:
+  watch:
+    types: [created]
+
+  star:
+    types: [created]
+
+  schedule:
+    - cron: '0 16 */45 * *'
+
+jobs:
+  sync:
+    if: |
+      github.event_name == 'schedule' ||
+      (
+        github.event.sender.login == github.repository_owner &&
+        (github.event_name == 'watch' || github.event_name == 'star')
+      )
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run sync script
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_ENV: production
+          SYNC_REMOTE: ${{ github.event_name == 'watch' && 1 || 0 }}
+        run: node ./src/utils/sync.mjs
+
+      - name: commit changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: sync repo counts"
+          commit_user_name: Kshao123
+          commit_user_email: kshao123@users.noreply.github.com
