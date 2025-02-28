@@ -14,7 +14,32 @@ import { NextRequest, NextResponse } from "next/server";
 //   return redirect("/");
 // }
 
+const allowedOrigins = [
+  "https://ksh7.com",
+  "https://www.ksh7.com",
+  "http://local.ksh7.com:4000"
+];
+
+const HandleResponse = (origin?: string) => ({
+  json: (data: any, init?: ResponseInit) => {
+    return Response.json(data, {
+      ...init,
+      headers: {
+        ...init?.headers,
+        ...(origin ? { "Access-Control-Allow-Origin": origin, } : undefined)
+      },
+    })
+  }
+})
+
 export async function GET(req: NextRequest) {
+  const origin = req.headers.get("origin");
+  const Response = HandleResponse(origin!);
+
+  if (!allowedOrigins.includes(origin!)) {
+    return new NextResponse(null, { status: 403 });
+  }
+
   const header = headers();
   const data = req;
   // const data = await req.json();
