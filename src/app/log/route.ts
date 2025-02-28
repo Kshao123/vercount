@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
       return new NextResponse(null, { status: 403 });
     }
 
-    const header = headers();
+    const header = req.headers;
     const data = req;
     // const data = await req.json();
 
@@ -54,7 +54,7 @@ export async function GET(req: NextRequest) {
       // 需自行在 Tencent Cdn 中增加回源头部 => $client_ip
       header.get("X-Custom-IP") ||
       header.get("X-Forwarded-For")?.split(",")[0] ||
-      req.ip ||
+      // req.ip ||
       header.get("X-Real-IP");
 
     // Use structured logging where possible for easier parsing
@@ -64,7 +64,7 @@ export async function GET(req: NextRequest) {
       customIp: header.get("X-Custom-IP"),
       xForwardedHost: header.get("X-Forwarded-Host"),
       xForwardedFor: header.get("X-Forwarded-For"),
-      reqIp: req.ip,
+      // reqIp: req.ip,
     });
 
     if (!clientHost) {
@@ -88,11 +88,11 @@ export async function GET(req: NextRequest) {
 
     // logger.info(`Processing request`, { host, path, clientHost });
 
-    const [siteUVBefore, sitePVBefore, pagePVBefore] = await Promise.all([
-      getSiteUVBeforeData(host, path, protocol),
-      getSitePVBeforeData(host, path, protocol),
-      getPagePVBeforeData(host, path, protocol),
-    ]);
+    // const [siteUVBefore, sitePVBefore, pagePVBefore] = await Promise.all([
+    //   getSiteUVBeforeData(host, path, protocol),
+    //   getSitePVBeforeData(host, path, protocol),
+    //   getPagePVBeforeData(host, path, protocol),
+    // ]);
 
     // logger.info(`Initial data`, {
     //   siteUVBefore,
@@ -100,7 +100,16 @@ export async function GET(req: NextRequest) {
     //   pagePVBefore,
     // });
 
-    let [siteUV, sitePVAfter, pagePVAfter] = await Promise.all([
+    // let [siteUV, sitePVAfter, pagePVAfter] = await Promise.all([
+    //   updateSiteUV(host, clientHost, protocol),
+    //   updateSitePV(host, protocol),
+    //   updatePagePV(host, path, protocol),
+    // ]);
+
+    let [siteUVBefore, sitePVBefore, pagePVBefore, siteUV, sitePVAfter, pagePVAfter] = await Promise.all([
+      getSiteUVBeforeData(host, path, protocol),
+      getSitePVBeforeData(host, path, protocol),
+      getPagePVBeforeData(host, path, protocol),
       updateSiteUV(host, clientHost, protocol),
       updateSitePV(host, protocol),
       updatePagePV(host, path, protocol),
