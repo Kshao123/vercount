@@ -18,6 +18,7 @@ const allowedOrigins = [
 
 export const config = {
   // matcher: "/log",
+  matcher: "/null",
 };
 
 export default async function middleware(request: NextRequest) {
