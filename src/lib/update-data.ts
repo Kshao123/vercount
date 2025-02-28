@@ -46,6 +46,7 @@ export async function updateSiteUV(host: string, ip: string, protocol: string) {
   const liveSiteKey = `site_uv_live:${host}`;
 
   // 该方法用于向集合（Set）中添加一个成员。如果成员已经存在于集合中，则不会重复添加
+  // 返回 1 表明存在集合，0 则不存在
   const siteUVKey = await kv.sAdd(siteKey, ip);
   // 该方法用于返回集合（Set）中的成员数量。在代码中
   const siteUV = await kv.sCard(siteKey);
@@ -58,5 +59,5 @@ export async function updateSiteUV(host: string, ip: string, protocol: string) {
     kv.expire(liveSiteKey, EXPIRATION_TIME),
   ]);
 
-  return siteUV;
+  return [siteUV, siteUVKey];
 }
