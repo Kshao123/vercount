@@ -8,6 +8,7 @@ import {
 } from "./migrate.mjs";
 import { syncToGist } from "./gist.mjs";
 import { redisHandler } from "./services.mjs";
+import { DevelopmentSiteFile, isSyncDevelopment } from "./constants.mjs";
 
 const isProduction = process.env.NODE_ENV === "production";
 const SITE_URL =
@@ -24,7 +25,8 @@ async function syncFilesToGist(originSiteUvData, siteIps) {
     GIST_ID: "b3f461eb23fa0bebbc56b6f76062ef70",
     FILES: {
       [COUNTS]: JSON.parse(await getFile(COUNTS)),
-      [ORIGIN_SITE_FILE]: originSiteUvData,
+      [isSyncDevelopment ? DevelopmentSiteFile : ORIGIN_SITE_FILE]:
+        originSiteUvData,
       [CURRENT_SITE_IP_FILE]: {
         length: siteIps.length,
         ips: siteIps,
@@ -75,11 +77,11 @@ async function syncSiteUVToRedis(siteUV) {
     // REDIS_VALUE: siteUV
     redisData: {
       [`site_uv_live:${host}`]: siteUV?.site_uv,
-      [`site_pv:${host}`]: siteUV?.page_pv,
+      [`site_pv:${host}`]: siteUV?.site_pv,
     },
     type: 52,
   });
-  
+
   return response;
 }
 
@@ -87,10 +89,8 @@ async function syncSiteUV() {
   const originSiteUvData = await getOriginSiteUvDate();
   const siteIps = await getCurrentSiteIps();
 
-  if (isProduction) {
-    await syncFilesToGist(originSiteUvData, siteIps);
-  }
-  
+  await syncFilesToGist(originSiteUvData, siteIps);
+
   await syncSiteUVToRedis(originSiteUvData?.site_uv);
 }
 

@@ -3,6 +3,7 @@ import * as cheerio from "cheerio";
 import fs from "fs/promises";
 import path from "path";
 import { redisHandler } from "./services.mjs";
+import { DevelopmentSiteCOUNTS } from "./constants.mjs";
 
 export const SITE_MAP = "sitemap.xml";
 export const COUNTS = "counts.json";
@@ -16,9 +17,6 @@ export const __dirname = import.meta.dirname;
 console.log(__dirname, "__dirname");
 
 export async function saveFile(name, value) {
-  if (isSyncDevelopment) {
-    return;
-  }
   await fs.writeFile(path.join(__dirname, `./files/${name}`), value, "utf8");
 }
 
@@ -46,7 +44,7 @@ export async function fetchBusuanziData(url, headers) {
       if (response.ok) {
         const dataStr = await response.text();
         const dataDict = JSON.parse(dataStr.substring(34, dataStr.length - 13));
-        console.log(dataDict, headers?.Referer, 'fetchBusuanziData');
+        console.log(dataDict, headers?.Referer, "fetchBusuanziData");
         return dataDict;
       } else {
         console.log(`Non-200 response: ${response.status}`, headers?.Referer);
@@ -70,10 +68,13 @@ function parseUrlsFromSiteMap(sitemap) {
       return $(item).text();
     })
     .get();
+  // console.log(urls.length, urls.filter((url) => url.includes("post")).length, 'sitemap');
   const filteredUrls = urls
-    .filter((url) => url.includes("post"))
+    // .filter((url) => url.includes("post"))
     .map((url) => {
-      const nextUrl = isSyncDevelopment ? url.replace('https://ksh7.com', 'http://local.ksh7.com:4000') : url;
+      const nextUrl = isSyncDevelopment
+        ? url.replace("https://ksh7.com", "http://local.ksh7.com:4000")
+        : url;
       return [
         nextUrl,
         // `${url}index.html`,
@@ -83,14 +84,14 @@ function parseUrlsFromSiteMap(sitemap) {
   return filteredUrls;
 }
 
-export async function getPostUrls(sitemap = 'https://ksh7.com/sitemap.xml') {
+export async function getPostUrls(sitemap = "https://ksh7.com/sitemap.xml") {
   try {
     const response = await fetch(sitemap);
     if (!response.ok) {
       throw new Error(`Failed to fetch sitemap: ${response.status}`);
     }
     const dataStr = await response.text();
-    await saveFile(SITE_MAP, dataStr);
+    // await saveFile(SITE_MAP, dataStr);
     return parseUrlsFromSiteMap(dataStr);
   } catch (error) {
     console.log("get site map error", error);
@@ -167,7 +168,7 @@ async function updateCountLoop(urls) {
         });
       }
     }
-    
+
     if (isSyncDevelopment) {
       countEntries[item.key].pagePv = item.rootPagePv;
     } else {
@@ -199,9 +200,9 @@ async function setRedisKv(data) {
  * 根据 todo 顺序来
  */
 export async function migrateLocal() {
-  // const sitemap = await getFile(SITE_MAP);
+  const sitemap = await getFile(SITE_MAP);
   // 从 sitemap 中获取所有 post url
-  // const filteredUrls = parseUrlsFromSiteMap(sitemap);
+  const filteredUrls = parseUrlsFromSiteMap(sitemap);
 
   // const counts = await updateCountLoop(filteredUrls.slice(0, 4));
   // todo 2 获取对应在 busaunzi 的数据
@@ -209,32 +210,37 @@ export async function migrateLocal() {
   // saveFile(COUNTS, JSON.stringify(counts));
 
   // todo 3
-  const counts = JSON.parse(await getFile(COUNTS));
-  console.log(counts);
+  // const counts = JSON.parse(await getFile(COUNTS));
+  // console.log(counts);
 
   // 将 busaunzi 的数据转为 redis 格式
-  const redisData = await transformCountData(counts);
+  // const redisData = await transformCountData(counts);
 
-  console.log(redisData);
+  // console.log(redisData);
   // await setRedisKv(redisData);
 
   console.log("migrate done");
 }
 
+// migrateLocal();
+
 export async function migrateOnline(config) {
   const { sitemap } = config || {};
-  
+
   const filteredUrls = await getPostUrls(sitemap);
 
   const counts = await updateCountLoop(filteredUrls);
-  await saveFile(COUNTS, JSON.stringify(counts));
+  await saveFile(
+    isSyncDevelopment ? DevelopmentSiteCOUNTS : COUNTS,
+    JSON.stringify(counts),
+  );
 
-  console.log(counts, 'counts in migrateOnline');
+  console.log(counts, "counts in migrateOnline");
 
   // 将 busaunzi 的数据转为 redis 格式
   const redisData = await transformCountData(counts);
 
-  console.log(redisData, 'redisData in migrateOnline');
+  console.log(redisData, "redisData in migrateOnline");
   await setRedisKv(redisData);
 
   console.log("migrate done");
