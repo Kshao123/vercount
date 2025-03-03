@@ -10,7 +10,7 @@ export default async function syncBusuanziData(host: string, path: string, proto
   // 如果不是第一次访问，则添加 Cookie，同步 busuanzi
   // 有 cookie 则当前和 busuanzi 同时 +1，反之都不加
   if (!isFirstUser) {
-    headers['Cookie'] = "busuanziId=89D15D1F66D2494F91FB315545BF9C2A"
+    headers['Cookie'] = "busuanziId=2B13C109D79D4BB5B4195A57E61D3086"
   }
 
   logger.debug(

@@ -138,6 +138,7 @@ export async function GET(req: NextRequest) {
       siteUVAfter,
       sitePVAfter,
       pagePVAfter,
+      clientHost,
     });
 
     syncBusuanziData(host, path, protocol, isFirstUser);
