@@ -18,7 +18,10 @@ export async function redisHandler(data) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          REDIS_URL: process.env.REDIS_URL,
+        }),
       },
     ).then((res) => res.json());
 
