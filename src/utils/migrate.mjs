@@ -42,10 +42,11 @@ export async function fetchBusuanziData(url, headers) {
       if (response.ok) {
         const dataStr = await response.text();
         const dataDict = JSON.parse(dataStr.substring(34, dataStr.length - 13));
-        console.log(dataDict, headers?.Referer);
+        console.log(dataDict, headers?.Referer, 'fetchBusuanziData');
         return dataDict;
       } else {
         console.log(`Non-200 response: ${response.status}`, headers?.Referer);
+        throw new Error(`Non-200 response: ${response.status}[from-throw]`);
       }
     } catch (e) {
       console.error(`Attempt ${attempt + 1} failed: ${e}`, headers?.Referer);
@@ -99,7 +100,7 @@ export async function getPostUrls(sitemap = 'https://ksh7.com/sitemap.xml') {
  */
 async function updateCountLoop(urls) {
   const countEntries = {};
-  const delayTime = 2500; // 1 秒，单位为毫秒
+  const delayTime = 2000; // 1 秒，单位为毫秒
 
   for (let i = 0; i < urls.length; i++) {
     const current = urls[i];
@@ -120,6 +121,7 @@ async function updateCountLoop(urls) {
     if (isProduction) {
       item.htmlPv = fetchBusuanziData(BUSUANZI_URL, getHeaders(true)).then(
         (res) => {
+          console.log(res, `htmlPv set from ${key}`);
           countEntries[key].htmlPv = res.page_pv;
         },
       );
@@ -127,14 +129,15 @@ async function updateCountLoop(urls) {
 
     item.rootPagePv = fetchBusuanziData(BUSUANZI_URL, getHeaders()).then(
       (res) => {
+        console.log(res, `rootPagePv set from ${key}`);
         countEntries[key].rootPagePv = res.page_pv;
       },
     );
 
     // 每两个迭代后延迟 1 秒
-    if ((i + 1) % 2 === 0) {
-      await new Promise((resolve) => setTimeout(() => resolve(), delayTime));
-    }
+    // if ((i + 1) % 2 === 0) {
+    await new Promise((resolve) => setTimeout(() => resolve(), delayTime));
+    // }
   }
 
   const errorPageKeys = [];
