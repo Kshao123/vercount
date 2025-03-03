@@ -33,12 +33,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_ENV: production
           SYNC_LOCAL: ${{ github.event_name == 'watch' && 1 || 0 }}
+          REDIS_URL: ${{ secrets.REDIS_URL }}
         run: node ./src/utils/sync.mjs
 
       - name: Run sync local script
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SYNC_LOCAL: ${{ github.event_name == 'watch' && 1 || 0 }}
+          REDIS_URL: ${{ secrets.REDIS_URL }}
         run: node ./src/utils/sync.mjs
 
       - name: commit changes
