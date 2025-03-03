@@ -12,11 +12,7 @@ on:
 jobs:
   sync:
     if: |
-      github.event_name == 'schedule' ||
-      (
-        github.event.sender.login == github.repository_owner &&
-        (github.event_name == 'watch')
-      )
+      github.event_name == 'schedule' || github.event_name == 'watch' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     permissions:
       contents: write
