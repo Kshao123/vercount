@@ -22,7 +22,8 @@ export const config = {
 };
 
 export default async function middleware(request: NextRequest) {
-  const ip = request.ip ?? "127.0.0.1";
+  const ip = "127.0.0.1";
+  // const ip = request.ip ?? "127.0.0.1";
   const ua = request.headers.get("user-agent")?.toLowerCase() || "unknown";
   const origin = request.headers.get("origin");
 
