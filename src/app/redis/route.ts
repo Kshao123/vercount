@@ -4,7 +4,7 @@ import logger from "@/lib/logger";
 import { EXPIRATION_TIME_POST } from "@/lib/get-busuanzi-data";
 import { createClient } from "redis";
 
-export enum HandleTypes {
+enum HandleTypes {
   REMOVE = 10,
   DELETE = 20,
   UPDATE = 30,
