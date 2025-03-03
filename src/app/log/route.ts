@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
+import { waitUntil } from '@vercel/functions';
 import {
   getPagePVBeforeData,
   getSitePVBeforeData,
@@ -13,11 +14,6 @@ import { NextRequest, NextResponse } from "next/server";
 // export async function GET(req: Request) {
 //   return redirect("/");
 // }
-
-export const config = {
-  runtime: 'edge',
-  background: true
-}
 
 const allowedOrigins = [
   "https://ksh7.com",
@@ -146,7 +142,8 @@ export async function GET(req: NextRequest) {
       clientHost,
     });
 
-    syncBusuanziData(host, path, protocol, isFirstUser);
+    // use waitUntil to avoid blocking the response and run background tasks
+    waitUntil(syncBusuanziData(host, path, protocol, isFirstUser));
 
     const dataDict = {
       site_uv: siteUVAfter,
