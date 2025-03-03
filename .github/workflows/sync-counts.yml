@@ -2,13 +2,12 @@ name: Sync Repository Counts
 
 on:
   watch:
-    types: [created]
-
-  star:
-    types: [created]
-
+    types: started
   schedule:
-    - cron: '0 16 */29 * *'
+    - cron: "0 16 */29 * *"
+
+  # support Manual
+  workflow_dispatch:
 
 jobs:
   sync:
@@ -16,7 +15,7 @@ jobs:
       github.event_name == 'schedule' ||
       (
         github.event.sender.login == github.repository_owner &&
-        (github.event_name == 'watch' || github.event_name == 'star')
+        (github.event_name == 'watch')
       )
     runs-on: ubuntu-latest
     permissions:
@@ -28,7 +27,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install
