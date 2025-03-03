@@ -32,10 +32,16 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Run sync script
+      - name: Run sync remote script
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_ENV: production
+          SYNC_LOCAL: ${{ github.event_name == 'watch' && 1 || 0 }}
+        run: node ./src/utils/sync.mjs
+
+      - name: Run sync local script
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SYNC_LOCAL: ${{ github.event_name == 'watch' && 1 || 0 }}
         run: node ./src/utils/sync.mjs
 

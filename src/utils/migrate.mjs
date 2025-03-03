@@ -8,6 +8,7 @@ export const SITE_MAP = "sitemap.xml";
 export const COUNTS = "counts.json";
 export const BUSUANZI_URL =
   "https://busuanzi.ibruce.info/busuanzi?jsonpCallback=BusuanziCallback_777487655111";
+const isProduction = process.env.NODE_ENV === "production";
 
 export const __dirname = import.meta.dirname;
 
@@ -67,9 +68,7 @@ function parseUrlsFromSiteMap(sitemap) {
   const filteredUrls = urls
     .filter((url) => url.includes("post"))
     .map((url) => {
-      // todo
-      // const nextUrl = url.replace('https://ksh7.com', 'http://local.ksh7.com:4000');
-      const nextUrl = url;
+      const nextUrl = isProduction ? url : url.replace('https://ksh7.com', 'http://local.ksh7.com:4000');
       return [
         nextUrl,
         // `${url}index.html`,
@@ -79,8 +78,7 @@ function parseUrlsFromSiteMap(sitemap) {
   return filteredUrls;
 }
 
-export async function getPostUrls() {
-  const sitemap = "https://ksh7.com/sitemap.xml";
+export async function getPostUrls(sitemap = 'https://ksh7.com/sitemap.xml') {
   try {
     const response = await fetch(sitemap);
     if (!response.ok) {
@@ -119,11 +117,13 @@ async function updateCountLoop(urls) {
     const item = { key, pagePv: 0, htmlPv: 0, rootPagePv: 0 };
     countEntries[key] = item;
 
-    item.htmlPv = fetchBusuanziData(BUSUANZI_URL, getHeaders(true)).then(
-      (res) => {
-        countEntries[key].htmlPv = res.page_pv;
-      },
-    );
+    if (isProduction) {
+      item.htmlPv = fetchBusuanziData(BUSUANZI_URL, getHeaders(true)).then(
+        (res) => {
+          countEntries[key].htmlPv = res.page_pv;
+        },
+      );
+    }
 
     item.rootPagePv = fetchBusuanziData(BUSUANZI_URL, getHeaders()).then(
       (res) => {
@@ -160,7 +160,12 @@ async function updateCountLoop(urls) {
         });
       }
     }
-    countEntries[item.key].pagePv = item.htmlPv + item.rootPagePv;
+    
+    if (isProduction) {
+      countEntries[item.key].pagePv = item.htmlPv + item.rootPagePv;
+    } else {
+      countEntries[item.key].pagePv = item.rootPagePv;
+    }
   }
 
   console.log(errorPageKeys, "errorPageKeys");
@@ -209,8 +214,10 @@ export async function migrateLocal() {
   console.log("migrate done");
 }
 
-export async function migrateOnline() {
-  const filteredUrls = await getPostUrls();
+export async function migrateOnline(config) {
+  const { sitemap } = config;
+  
+  const filteredUrls = await getPostUrls(sitemap);
 
   const counts = await updateCountLoop(filteredUrls);
   await saveFile(COUNTS, JSON.stringify(counts));

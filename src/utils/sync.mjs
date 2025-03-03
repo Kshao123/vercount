@@ -12,7 +12,7 @@ import { redisHandler } from "./services.mjs";
 const isProduction = process.env.NODE_ENV === "production";
 const SITE_URL =
   process.env.SITE_URL || isProduction
-    ? "https://ksh7.com"
+    ? "https://ksh7.com/"
     : "http://local.ksh7.com:4000/";
 const ORIGIN_SITE_FILE = "origin-site.json";
 const CURRENT_SITE_IP_FILE = "site-ip.json";
