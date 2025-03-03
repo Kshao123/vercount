@@ -215,7 +215,7 @@ export async function migrateLocal() {
 }
 
 export async function migrateOnline(config) {
-  const { sitemap } = config;
+  const { sitemap } = config || {};
   
   const filteredUrls = await getPostUrls(sitemap);
 
