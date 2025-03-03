@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
-import { waitUntil } from '@vercel/functions';
+import { after } from 'next/server';
 import {
   getPagePVBeforeData,
   getSitePVBeforeData,
@@ -142,8 +142,11 @@ export async function GET(req: NextRequest) {
       clientHost,
     });
 
-    // use waitUntil to avoid blocking the response and run background tasks
-    waitUntil(syncBusuanziData(host, path, protocol, isFirstUser));
+    // use after to avoid blocking the response and run background tasks
+    after(async () => {
+      await syncBusuanziData(host, path, protocol, isFirstUser);
+      logger.info(`sync done`);
+    });
 
     const dataDict = {
       site_uv: siteUVAfter,
