@@ -7,6 +7,7 @@ import {
   getFile,
 } from "./migrate.mjs";
 import { syncToGist } from "./gist.mjs";
+import { redisHandler } from "./services.mjs";
 
 const isProduction = process.env.NODE_ENV === "production";
 const SITE_URL =
@@ -15,6 +16,8 @@ const SITE_URL =
     : "http://local.ksh7.com:4000/";
 const ORIGIN_SITE_FILE = "origin-site.json";
 const CURRENT_SITE_IP_FILE = "site-ip.json";
+
+const { host } = new URL(SITE_URL);
 
 async function syncFilesToGist(originSiteUvData, siteIps) {
   const config = {
@@ -41,29 +44,17 @@ async function syncRecentlyPosts() {
 }
 
 async function getCurrentSiteIps() {
-  const { host } = new URL(SITE_URL);
   try {
-    const response = await fetch(
-      isProduction
-        ? "https://busuanzi.ksh7.com/redis"
-        : "http://localhost:3000/redis",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          type: 41,
-          REDIS_KEY: `site_uv:${host}`,
-        }),
-      },
-    ).then((res) => res.json());
-    
-    console.log(response, 'getCurrentSiteIps');
-    
+    const response = await redisHandler({
+      type: 41,
+      REDIS_KEY: `site_uv:${host}`,
+    });
+
+    console.log(response, "getCurrentSiteIps");
+
     return response?.ips;
   } catch (error) {
-    console.error(error, 'getCurrentSiteIps');
+    console.error(error, "getCurrentSiteIps");
     process.exit(1);
   }
 }
@@ -77,20 +68,33 @@ async function getOriginSiteUvDate() {
   return await fetchBusuanziData(BUSUANZI_URL, headers);
 }
 
+async function syncSiteUVToRedis(siteUV) {
+  const response = await redisHandler({
+    // type: 50,
+    // REDIS_KEY: `site_uv_live:${host}`,
+    // REDIS_VALUE: siteUV
+    redisData: {
+      [`site_uv_live:${host}`]: siteUV?.site_uv,
+      [`site_pv:${host}`]: siteUV?.page_pv,
+    },
+    type: 52,
+  });
+  
+  return response;
+}
+
 async function syncSiteUV() {
   const originSiteUvData = await getOriginSiteUvDate();
   const siteIps = await getCurrentSiteIps();
 
-  return await syncFilesToGist(originSiteUvData, siteIps);
+  await syncFilesToGist(originSiteUvData, siteIps);
+  
+  await syncSiteUVToRedis(originSiteUvData?.site_uv);
 }
 
-/**
- * 每 45 天，执行一次
- * 理论
- */
 async function sync() {
   await migrateOnline();
-  
+
   await syncSiteUV();
 }
 

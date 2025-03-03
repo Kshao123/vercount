@@ -3,7 +3,7 @@ import kv from '@/storage';
 import logger from "@/lib/logger";
 
 export const EXPIRATION_TIME = 60 * 60 * 24 * 30; // Adjust as needed
-export const EXPIRATION_TIME_POST = 60 * 60 * 24 * 45;
+export const EXPIRATION_TIME_POST = 60 * 60 * 24 * 30;
 
 const MAX_RETRIES = 3;
 const BUSUANZI_URL =

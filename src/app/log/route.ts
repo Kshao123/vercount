@@ -106,10 +106,21 @@ export async function GET(req: NextRequest) {
     //   updatePagePV(host, path, protocol),
     // ]);
 
+    // todo 减少 kv 的交互逻辑
+    // www.ksh7.com
+    // let [siteUVBefore, sitePVBefore, pagePVBefore, siteUV, sitePVAfter, pagePVAfter] = await Promise.all([
+    //   getSiteUVBeforeData(host, path, protocol),
+    //   getSitePVBeforeData(host, path, protocol),
+    //   getPagePVBeforeData(host, path, protocol),
+    //   updateSiteUV(host, clientHost, protocol),
+    //   updateSitePV(host, protocol),
+    //   updatePagePV(host, path, protocol),
+    // ]);
     let [siteUVBefore, sitePVBefore, pagePVBefore, siteUV, sitePVAfter, pagePVAfter] = await Promise.all([
-      getSiteUVBeforeData(host, path, protocol),
-      getSitePVBeforeData(host, path, protocol),
-      getPagePVBeforeData(host, path, protocol),
+      0, 0, 0,
+      // getSiteUVBeforeData(host, path, protocol),
+      // getSitePVBeforeData(host, path, protocol),
+      // getPagePVBeforeData(host, path, protocol),
       updateSiteUV(host, clientHost, protocol),
       updateSitePV(host, protocol),
       updatePagePV(host, path, protocol),

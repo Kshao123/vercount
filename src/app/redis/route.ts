@@ -32,6 +32,10 @@ async function handleSetRedis(
   }
 
   switch (type) {
+    case HandleTypes.SET: {
+      await kv.set(redisData.REDIS_KEY, redisData.REDIS_VALUE, { EX: EXPIRATION_TIME_POST });
+      break;
+    }
     case HandleTypes.SET_ALL: {
       await kv.mSet(redisData);
       break;
@@ -95,6 +99,10 @@ export async function POST(request: NextRequest) {
     logger.info(`current processing -->`, type);
 
     switch (type) {
+      case HandleTypes.SET: {
+        await handleSetRedis(type, data);
+        break;
+      }
       case HandleTypes.SET_ALL: {
         await handleSetRedis(type, data.redisData);
         break;

@@ -14,11 +14,11 @@ export async function updatePagePV(host: string, path: string, protocol: string)
     `Page PV updated for host: ${protocol}//${host}${path}, page_pv: ${pagePV}`,
   );
 
-  const expirationTime = getExpirationTime(path);
-  await Promise.all([
-    kv.expire(pageKey, expirationTime),
-    kv.expire(livePageKey, expirationTime),
-  ]);
+  // const expirationTime = getExpirationTime(path);
+  // await Promise.all([
+  //   kv.expire(pageKey, expirationTime),
+  //   kv.expire(livePageKey, expirationTime),
+  // ]);
 
   return pagePV;
 }
@@ -32,10 +32,10 @@ export async function updateSitePV(host: string, protocol: string) {
   const sitePV = await kv.incr(siteKey);
   logger.debug(`Site PV updated for host: ${protocol}//${host}, site_pv: ${sitePV}`);
 
-  await Promise.all([
-    kv.expire(siteKey, EXPIRATION_TIME),
-    kv.expire(liveSiteKey, EXPIRATION_TIME),
-  ]);
+  // await Promise.all([
+  //   kv.expire(siteKey, EXPIRATION_TIME),
+  //   kv.expire(liveSiteKey, EXPIRATION_TIME),
+  // ]);
 
   return sitePV;
 }
@@ -54,10 +54,10 @@ export async function updateSiteUV(host: string, ip: string, protocol: string) {
     `Site UV updated for host: ${protocol}//${host}, site_uv: ${siteUV}, site_uv_key: ${siteUVKey}`,
   );
 
-  await Promise.all([
-    kv.expire(siteKey, EXPIRATION_TIME),
-    kv.expire(liveSiteKey, EXPIRATION_TIME),
-  ]);
+  // await Promise.all([
+  //   kv.expire(siteKey, EXPIRATION_TIME),
+  //   kv.expire(liveSiteKey, EXPIRATION_TIME),
+  // ]);
 
   return [siteUV, siteUVKey];
 }

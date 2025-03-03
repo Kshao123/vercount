@@ -25,8 +25,8 @@ var visitorCounterCaller, visitorCounterDisplay;
   }
 
   const getBaseUrl = () => {
-    // return "https://busuanzi.ksh7.com";
-    return "//local.ksh7.com:3000";
+    return "https://busuanzi.ksh7.com";
+    // return "//local.ksh7.com:3000";
   };
 
   visitorCounterCaller = {
