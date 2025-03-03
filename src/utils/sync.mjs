@@ -100,7 +100,7 @@ async function syncSiteUV() {
 }
 
 async function sync() {
-  // await migrateOnline();
+  await migrateOnline();
 
   await syncSiteUV();
 }
