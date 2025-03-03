@@ -25,6 +25,18 @@ export async function syncBusuanziDataRemote(
   );
 }
 
+export async function syncBusuanziDataLocal(
+  host: string,
+  path: string,
+  protocol: string,
+  isFirstUser?: number,
+) {
+  syncBusuanziData(host, path, protocol, isFirstUser);
+  return new Promise(resolve => {
+    setTimeout(resolve, 30);
+  });
+}
+
 export default async function syncBusuanziData(
   host: string,
   path: string,

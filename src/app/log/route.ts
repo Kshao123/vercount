@@ -6,7 +6,7 @@ import {
   getSiteUVBeforeData,
 } from "@/lib/get-before-data";
 import { updatePagePV, updateSitePV, updateSiteUV } from "@/lib/update-data";
-import { syncBusuanziDataRemote } from "@/lib/sync-busuanzi-data";
+import syncBusuanziData, { syncBusuanziDataLocal } from "@/lib/sync-busuanzi-data";
 import logger from "@/lib/logger"; // Ensure this logger is configured for env-based logging
 import { NextRequest, NextResponse } from "next/server";
 
@@ -141,7 +141,7 @@ export async function GET(req: NextRequest) {
       clientHost,
     });
 
-    syncBusuanziDataRemote(host, path, protocol, isFirstUser);
+    await syncBusuanziDataLocal(host, path, protocol, isFirstUser);
 
     const dataDict = {
       site_uv: siteUVAfter,
