@@ -63,11 +63,14 @@ function parseUrlsFromSiteMap(sitemap) {
     xmlMode: true,
   });
 
-  const urls = $("loc")
+  let urls = $("loc")
     .map((index, item) => {
       return $(item).text();
     })
     .get();
+  
+  urls = isSyncDevelopment ? urls.filter((url) => url.includes("post")) : urls;
+  
   // console.log(urls.length, urls.filter((url) => url.includes("post")).length, 'sitemap');
   const filteredUrls = urls
     // .filter((url) => url.includes("post"))
@@ -127,7 +130,7 @@ async function updateCountLoop(urls) {
       item.htmlPv = fetchBusuanziData(BUSUANZI_URL, getHeaders(true)).then(
         (res) => {
           console.log(res, `htmlPv set from ${key}`);
-          countEntries[key].htmlPv = res.page_pv;
+          countEntries[key].htmlPv = res?.page_pv;
         },
       );
     }
@@ -135,7 +138,7 @@ async function updateCountLoop(urls) {
     item.rootPagePv = fetchBusuanziData(BUSUANZI_URL, getHeaders()).then(
       (res) => {
         console.log(res, `rootPagePv set from ${key}`);
-        countEntries[key].rootPagePv = res.page_pv;
+        countEntries[key].rootPagePv = res?.page_pv;
       },
     );
 
