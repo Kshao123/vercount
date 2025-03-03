@@ -48,7 +48,8 @@ async function handleSetRedis(
         multi.set(key, value, { EX: EXPIRATION_TIME_POST });
       }
       try {
-        await multi.exec();
+        const res = await multi.exec();
+        logger.info("handleSetRedis: redisData: res", res);
       } catch (error) {
         throw new Error(`handleSetRedis: in batch exec -> ${error}`);
       }
@@ -89,6 +90,7 @@ export async function POST(request: NextRequest) {
   const { REDIS_URL, type } = (data || {}) as HandleRedisType;
 
   if (isProduction && (!REDIS_URL || REDIS_URL !== process.env.REDIS_URL)) {
+    logger.error(`Missing params REDIS_URL =>【POST】REDIS_URL: ${REDIS_URL}; process.env.REDIS_URL: ${process.env.REDIS_URL}`);
     return Response.json(
       { error: "Missing params REDIS_URL" },
       { status: 403 },
@@ -121,8 +123,8 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     logger.error(`${error.name}: ${error.message}`);
     return Response.json({ error: `Server Error: ${error}` }, { status: 500 });
+  } finally {
+    logger.info(`processing finished -->`, type);
   }
-
-  logger.info(`processing finished -->`, type);
   return Response.json({ success: true, message: "OK" });
 }
