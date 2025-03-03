@@ -117,9 +117,9 @@ export async function GET(req: NextRequest) {
     //   updatePagePV(host, path, protocol),
     // ]);
     let [siteUVBefore, sitePVBefore, pagePVBefore, siteUV, sitePVAfter, pagePVAfter] = await Promise.all([
-      0, 0, 0,
-      // getSiteUVBeforeData(host, path, protocol),
+      getSiteUVBeforeData(host, path, protocol),
       // getSitePVBeforeData(host, path, protocol),
+      0,0,
       // getPagePVBeforeData(host, path, protocol),
       updateSiteUV(host, clientHost, protocol),
       updateSitePV(host, protocol),
