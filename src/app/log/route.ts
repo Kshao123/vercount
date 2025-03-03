@@ -14,6 +14,11 @@ import { NextRequest, NextResponse } from "next/server";
 //   return redirect("/");
 // }
 
+export const config = {
+  runtime: 'edge',
+  background: true
+}
+
 const allowedOrigins = [
   "https://ksh7.com",
   "https://www.ksh7.com",
@@ -22,7 +27,7 @@ const allowedOrigins = [
 
 const HandleResponse = (origin?: string) => ({
   json: (data: any, init?: ResponseInit) => {
-    return Response.json(data, {
+    return NextResponse.json(data, {
       ...init,
       headers: {
         ...init?.headers,
@@ -81,7 +86,7 @@ export async function GET(req: NextRequest) {
     const parsedUrl = new URL(url);
 
     const [host, path, protocol] = [
-      parsedUrl.host,
+      parsedUrl.host?.replace('www.ksh7.com', 'ksh7.com'),
       parsedUrl.pathname.replace(/\/index(\.html?\/?)$/i, ""),
       parsedUrl.protocol,
     ];
@@ -141,7 +146,7 @@ export async function GET(req: NextRequest) {
       clientHost,
     });
 
-    await syncBusuanziDataLocal(host, path, protocol, isFirstUser);
+    syncBusuanziData(host, path, protocol, isFirstUser);
 
     const dataDict = {
       site_uv: siteUVAfter,

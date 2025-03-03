@@ -31,9 +31,10 @@ export async function syncBusuanziDataLocal(
   protocol: string,
   isFirstUser?: number,
 ) {
+  logger.info("syncBusuanziDataLocal");
   syncBusuanziData(host, path, protocol, isFirstUser);
   return new Promise(resolve => {
-    setTimeout(resolve, 30);
+    setTimeout(resolve, 60);
   });
 }
 
