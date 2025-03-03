@@ -9,12 +9,16 @@ export const COUNTS = "counts.json";
 export const BUSUANZI_URL =
   "https://busuanzi.ibruce.info/busuanzi?jsonpCallback=BusuanziCallback_777487655111";
 const isProduction = process.env.NODE_ENV === "production";
+const isSyncDevelopment = Number(process.env.SYNC_DEV) === 1;
 
 export const __dirname = import.meta.dirname;
 
 console.log(__dirname, "__dirname");
 
 export async function saveFile(name, value) {
+  if (isSyncDevelopment) {
+    return;
+  }
   await fs.writeFile(path.join(__dirname, `./files/${name}`), value, "utf8");
 }
 
@@ -69,7 +73,7 @@ function parseUrlsFromSiteMap(sitemap) {
   const filteredUrls = urls
     .filter((url) => url.includes("post"))
     .map((url) => {
-      const nextUrl = isProduction ? url : url.replace('https://ksh7.com', 'http://local.ksh7.com:4000');
+      const nextUrl = isSyncDevelopment ? url.replace('https://ksh7.com', 'http://local.ksh7.com:4000') : url;
       return [
         nextUrl,
         // `${url}index.html`,
@@ -118,7 +122,7 @@ async function updateCountLoop(urls) {
     const item = { key, pagePv: 0, htmlPv: 0, rootPagePv: 0 };
     countEntries[key] = item;
 
-    if (isProduction) {
+    if (!isSyncDevelopment) {
       item.htmlPv = fetchBusuanziData(BUSUANZI_URL, getHeaders(true)).then(
         (res) => {
           console.log(res, `htmlPv set from ${key}`);
@@ -164,10 +168,10 @@ async function updateCountLoop(urls) {
       }
     }
     
-    if (isProduction) {
-      countEntries[item.key].pagePv = item.htmlPv + item.rootPagePv;
-    } else {
+    if (isSyncDevelopment) {
       countEntries[item.key].pagePv = item.rootPagePv;
+    } else {
+      countEntries[item.key].pagePv = item.htmlPv + item.rootPagePv;
     }
   }
 
@@ -225,13 +229,13 @@ export async function migrateOnline(config) {
   const counts = await updateCountLoop(filteredUrls);
   await saveFile(COUNTS, JSON.stringify(counts));
 
-  console.log(counts);
+  console.log(counts, 'counts in migrateOnline');
 
   // 将 busaunzi 的数据转为 redis 格式
   const redisData = await transformCountData(counts);
 
-  console.log(redisData);
-  await setRedisKv(redisData, true);
+  console.log(redisData, 'redisData in migrateOnline');
+  await setRedisKv(redisData);
 
   console.log("migrate done");
 }

@@ -87,7 +87,9 @@ async function syncSiteUV() {
   const originSiteUvData = await getOriginSiteUvDate();
   const siteIps = await getCurrentSiteIps();
 
-  await syncFilesToGist(originSiteUvData, siteIps);
+  if (isProduction) {
+    await syncFilesToGist(originSiteUvData, siteIps);
+  }
   
   await syncSiteUVToRedis(originSiteUvData?.site_uv);
 }
