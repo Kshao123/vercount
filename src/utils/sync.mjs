@@ -2,13 +2,16 @@ import {
   migrateOnline,
   BUSUANZI_URL,
   fetchBusuanziData,
-  __dirname,
   COUNTS,
   getFile,
 } from "./migrate.mjs";
 import { syncToGist } from "./gist.mjs";
 import { redisHandler } from "./services.mjs";
-import { DevelopmentSiteFile, isSyncDevelopment } from "./constants.mjs";
+import {
+  DEVELOPMENT_SITE_IP_FILE,
+  DevelopmentSiteFile,
+  isSyncDevelopment,
+} from "./constants.mjs";
 
 const isProduction = process.env.NODE_ENV === "production";
 const SITE_URL =
@@ -27,7 +30,7 @@ async function syncFilesToGist(originSiteUvData, siteIps) {
       [COUNTS]: JSON.parse(await getFile(COUNTS)),
       [isSyncDevelopment ? DevelopmentSiteFile : ORIGIN_SITE_FILE]:
         originSiteUvData,
-      [CURRENT_SITE_IP_FILE]: {
+      [isSyncDevelopment ? DEVELOPMENT_SITE_IP_FILE : CURRENT_SITE_IP_FILE]: {
         length: siteIps.length,
         ips: siteIps,
       },
@@ -82,6 +85,8 @@ async function syncSiteUVToRedis(siteUV) {
     type: 52,
   });
 
+  console.log(response, "syncSiteUVToRedis", siteUV);
+
   return response;
 }
 
@@ -91,11 +96,11 @@ async function syncSiteUV() {
 
   await syncFilesToGist(originSiteUvData, siteIps);
 
-  await syncSiteUVToRedis(originSiteUvData?.site_uv);
+  await syncSiteUVToRedis(originSiteUvData);
 }
 
 async function sync() {
-  await migrateOnline();
+  // await migrateOnline();
 
   await syncSiteUV();
 }
