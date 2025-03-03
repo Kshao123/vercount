@@ -6,7 +6,7 @@ import {
   getSiteUVBeforeData,
 } from "@/lib/get-before-data";
 import { updatePagePV, updateSitePV, updateSiteUV } from "@/lib/update-data";
-import syncBusuanziData from "@/lib/sync-busuanzi-data";
+import { syncBusuanziDataRemote } from "@/lib/sync-busuanzi-data";
 import logger from "@/lib/logger"; // Ensure this logger is configured for env-based logging
 import { NextRequest, NextResponse } from "next/server";
 
@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
 
     const clientHost =
       // 需自行在 Tencent Cdn 中增加回源头部 => $client_ip
-      header.get("X-Custom-IP") ||
+      header.get("X-Custom-IP")?.split(",")[0] ||
       header.get("X-Forwarded-For")?.split(",")[0] ||
       // req.ip ||
       header.get("X-Real-IP");
@@ -141,7 +141,7 @@ export async function GET(req: NextRequest) {
       clientHost,
     });
 
-    syncBusuanziData(host, path, protocol, isFirstUser);
+    syncBusuanziDataRemote(host, path, protocol, isFirstUser);
 
     const dataDict = {
       site_uv: siteUVAfter,
