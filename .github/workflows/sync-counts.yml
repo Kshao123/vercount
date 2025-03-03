@@ -8,7 +8,7 @@ on:
     types: [created]
 
   schedule:
-    - cron: '0 16 */45 * *'
+    - cron: '0 16 */29 * *'
 
 jobs:
   sync:
@@ -37,7 +37,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_ENV: production
-          SYNC_REMOTE: ${{ github.event_name == 'watch' && 1 || 0 }}
+          SYNC_LOCAL: ${{ github.event_name == 'watch' && 1 || 0 }}
         run: node ./src/utils/sync.mjs
 
       - name: commit changes
