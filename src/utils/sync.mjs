@@ -44,10 +44,6 @@ async function syncFilesToGist(originSiteUvData, siteIps) {
   return await syncToGist(config.GIST_ID, config.FILES, config.OPTIONS);
 }
 
-async function syncRecentlyPosts() {
-  await migrateOnline();
-}
-
 async function getCurrentSiteIps() {
   try {
     const response = await redisHandler({
@@ -105,4 +101,4 @@ async function sync() {
   await syncSiteUV();
 }
 
-sync();
+await sync();

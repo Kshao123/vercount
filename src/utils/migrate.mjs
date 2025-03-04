@@ -68,9 +68,12 @@ function parseUrlsFromSiteMap(sitemap) {
       return $(item).text();
     })
     .get();
-  
-  urls = isSyncDevelopment ? urls.filter((url) => url.includes("post")) : urls;
-  
+
+  urls = isSyncDevelopment
+    // bdy and bilibili
+    ? urls.filter((url) => url.includes("post") || url.includes("/2020/04"))
+    : urls;
+
   // console.log(urls.length, urls.filter((url) => url.includes("post")).length, 'sitemap');
   const filteredUrls = urls
     // .filter((url) => url.includes("post"))
@@ -180,6 +183,14 @@ async function updateCountLoop(urls) {
   }
 
   console.log(errorPageKeys, "errorPageKeys");
+  
+  if (errorPageKeys?.length && !isSyncDevelopment) {
+    await saveFile('errorPageKeys.json', JSON.stringify({
+      date: new Date().toISOString(),
+      errorPageKeys,
+    }))
+  }
+  
   return countEntries;
 }
 

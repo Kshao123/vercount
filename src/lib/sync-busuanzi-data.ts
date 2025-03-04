@@ -1,42 +1,5 @@
 import logger from "@/lib/logger";
-
-export async function syncBusuanziDataRemote(
-  host: string,
-  path: string,
-  protocol: string,
-  isFirstUser?: number,
-) {
-  await fetch(
-    process.env.NODE_ENV === "production"
-      ? "https://busuanzi.ksh7.com/sync"
-      : "http://local.ksh7.com:3000/sync",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        host,
-        path,
-        protocol,
-        isFirstUser,
-      }),
-    },
-  );
-}
-
-export async function syncBusuanziDataLocal(
-  host: string,
-  path: string,
-  protocol: string,
-  isFirstUser?: number,
-) {
-  logger.info("syncBusuanziDataLocal");
-  syncBusuanziData(host, path, protocol, isFirstUser);
-  return new Promise(resolve => {
-    setTimeout(resolve, 60);
-  });
-}
+import { fetchBusuanziData } from "@/lib/get-busuanzi-data";
 
 export default async function syncBusuanziData(
   host: string,
@@ -50,6 +13,7 @@ export default async function syncBusuanziData(
     Referer: `${protocol}//${host}${path}`,
   };
 
+  // uv 的额外处理
   // 如果不是第一次访问，则添加 Cookie，同步 busuanzi
   // 有 cookie 则当前和 busuanzi 同时 +1，反之都不加
   if (!isFirstUser) {
@@ -61,10 +25,7 @@ export default async function syncBusuanziData(
   );
 
   try {
-    await fetch(url, {
-      method: "GET",
-      headers,
-    });
+    await fetchBusuanziData(url, headers);
     logger.debug(
       `Request sent successfully for host: ${protocol}//${host}${path}`,
     );

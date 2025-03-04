@@ -9,7 +9,7 @@ const MAX_RETRIES = 3;
 const BUSUANZI_URL =
   "https://busuanzi.ibruce.info/busuanzi?jsonpCallback=BusuanziCallback_777487655111";
 
-async function fetchBusuanziData(url: string, headers: any) {
+export async function fetchBusuanziData(url: string, headers: any) {
   logger.debug(headers, 'fetchBusuanziData.headers');
 
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {

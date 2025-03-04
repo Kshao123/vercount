@@ -7,7 +7,7 @@ import {
   getSiteUVBeforeData,
 } from "@/lib/get-before-data";
 import { updatePagePV, updateSitePV, updateSiteUV } from "@/lib/update-data";
-import syncBusuanziData, { syncBusuanziDataLocal } from "@/lib/sync-busuanzi-data";
+import syncBusuanziData from "@/lib/sync-busuanzi-data";
 import logger from "@/lib/logger"; // Ensure this logger is configured for env-based logging
 import { NextRequest, NextResponse } from "next/server";
 
@@ -83,7 +83,7 @@ export async function GET(req: NextRequest) {
 
     const [host, path, protocol] = [
       parsedUrl.host?.replace('www.ksh7.com', 'ksh7.com'),
-      parsedUrl.pathname.replace(/\/index(\.html?\/?)$/i, ""),
+      parsedUrl.pathname.replace(/\/index(\.html?\/?)$/i, "/"),
       parsedUrl.protocol,
     ];
 
@@ -107,8 +107,6 @@ export async function GET(req: NextRequest) {
     //   updatePagePV(host, path, protocol),
     // ]);
 
-    // todo 减少 kv 的交互逻辑
-    // www.ksh7.com
     // let [siteUVBefore, sitePVBefore, pagePVBefore, siteUV, sitePVAfter, pagePVAfter] = await Promise.all([
     //   getSiteUVBeforeData(host, path, protocol),
     //   getSitePVBeforeData(host, path, protocol),
@@ -145,7 +143,7 @@ export async function GET(req: NextRequest) {
     // use after to avoid blocking the response and run background tasks
     after(async () => {
       await syncBusuanziData(host, path, protocol, isFirstUser);
-      logger.info(`sync done`);
+      logger.info(`sync done`, host, path, protocol, isFirstUser);
     });
 
     const dataDict = {
