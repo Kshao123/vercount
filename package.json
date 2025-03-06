@@ -8,14 +8,11 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@upstash/ratelimit": "^2.0.5",
-    "@vercel/kv": "^3.0.0",
     "next": "15.2.0",
     "react": "^19",
     "react-dom": "^19",
     "redis": "^4.7.0",
-    "terser": "^5.39.0",
-    "winston": "^3.17.0"
+    "terser": "^5.39.0"
   },
   "devDependencies": {
     "@octokit/rest": "^21.1.1",

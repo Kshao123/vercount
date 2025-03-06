@@ -47,7 +47,7 @@ var visitorCounterCaller, visitorCounterDisplay;
         const data = await response.json();
         documentReady(() => {
           callback(data);
-          localStorage.setItem("visitorCountData", JSON.stringify(data));
+          // localStorage.setItem("visitorCountData", JSON.stringify(data));
           visitorCounterDisplay.showAll();
         });
       } catch (error) {
