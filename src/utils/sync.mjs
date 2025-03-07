@@ -36,7 +36,7 @@ async function syncFilesToGist(originSiteUvData, siteIps) {
       },
     },
     OPTIONS: {
-      deleteOrphaned: true,
+      // deleteOrphaned: true,
       description: "site uv sync",
     },
   };
