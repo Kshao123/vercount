@@ -28,9 +28,7 @@ jobs:
           secret_id: ${{secrets.TENCENT_CDN_CACHE_SECRET_ID}}
           secret_key: ${{secrets.TENCENT_CDN_CACHE_SECRET_KEY}}
           flush_type: delete
-
-      - name: Wait for 30 seconds
-        run: sleep 30
+          wait_flush_done: true
 
       - name: Tencent Cloud CDN Push Paths Cache
         uses: tardis-ksh/Tencent-Cloud-CDN-Push-Paths-Cache@v1
