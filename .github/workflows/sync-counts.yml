@@ -1,8 +1,8 @@
 name: Sync Repository Counts
 
 on:
-  watch:
-    types: started
+#  watch:
+#    types: started
   schedule:
     - cron: "0 16 */29 * *"
 
